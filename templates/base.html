@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>ShopEasy — {% block title %}Home{% endblock %}</title>
+  <style>
+    :root {
+      --navy:   #0f172a;
+      --navy2:  #1e293b;
+      --navy3:  #334155;
+      --accent: #f43f5e;
+      --acc2:   #e11d48;
+      --gold:   #f59e0b;
+      --green:  #10b981;
+      --blue:   #3b82f6;
+      --bg:     #f8fafc;
+      --card:   #ffffff;
+      --text:   #1e293b;
+      --muted:  #64748b;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 1px 3px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.05);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    a    { text-decoration: none; color: inherit; }
+    img  { display: block; max-width: 100%; }
+
+    /* ── TOP NAV ── */
+    .topnav {
+      background: var(--navy);
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .topnav .logo {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+    .topnav .logo span { color: var(--accent); }
+    .topnav .nav-right { display: flex; align-items: center; gap: 6px; }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,.08); color: #fff; }
+    .nav-btn.pill {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      border-radius: 20px;
+    }
+    .nav-btn.pill:hover { background: var(--acc2); }
+    .badge-dot {
+      background: var(--gold);
+      color: #000;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 10px;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    /* ── FLASH MESSAGES ── */
+    .flash-stack { position: fixed; top: 70px; right: 20px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+    .flash-msg {
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.15);
+      animation: slideIn .25s ease;
+      max-width: 320px;
+    }
+    @keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .flash-msg.success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .flash-msg.info    { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+    .flash-msg.error   { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+    /* ── CONTAINER ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 28px 32px; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 20px;
+      border-radius: 9px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 700;
+      transition: opacity .15s, transform .1s;
+    }
+    .btn:hover  { opacity: .88; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn-red    { background: var(--accent); color: #fff; }
+    .btn-dark   { background: var(--navy2); color: #fff; }
+    .btn-ghost  { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
+    .btn-ghost:hover { border-color: #94a3b8; }
+    .btn-green  { background: var(--green); color: #fff; }
+    .btn-sm     { padding: 6px 14px; font-size: 0.8rem; }
+
+    /* ── STAR RATING ── */
+    .stars { color: var(--gold); font-size: 14px; letter-spacing: 1px; }
+    .star-count { color: var(--muted); font-size: 0.78rem; margin-left: 4px; }
+
+    /* ── BADGE ── */
+    .product-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-bestseller { background: #fef3c7; color: #92400e; }
+    .badge-toprated   { background: #d1fae5; color: #065f46; }
+
+    /* ── DISCOUNT ── */
+    .orig-price { text-decoration: line-through; color: var(--muted); font-size: 0.82rem; }
+    .discount   { background: #fee2e2; color: #991b1b; font-size: 0.72rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--navy);
+      color: #475569;
+      text-align: center;
+      padding: 28px;
+      margin-top: 60px;
+      font-size: 0.82rem;
+    }
+    footer .f-logo { color: var(--accent); font-weight: 800; font-size: 1.1rem; margin-bottom: 6px; }
+    footer a { color: #64748b; }
+    footer a:hover { color: #94a3b8; }
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a href="/" class="logo">Shop<span>Easy</span></a>
+  <div class="nav-right">
+    <a href="/" class="nav-btn">🏠 Home</a>
+    <a href="/wishlist" class="nav-btn">
+      ♡ Wishlist
+      {% if wish_count > 0 %}<span class="badge-dot">{{ wish_count }}</span>{% endif %}
+    </a>
+    <a href="/orders" class="nav-btn">📦 Orders</a>
+    <a href="/cart" class="nav-btn pill">
+      🛒 Cart
+      {% if cart_count > 0 %}<span class="badge-dot">{{ cart_count }}</span>{% endif %}
+    </a>
+  </div>
+</nav>
+
+<!-- FLASH MESSAGES -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-stack">
+    {% for cat, msg in messages %}
+    <div class="flash-msg {{ cat }}">
+      {% if cat == 'success' %}✓{% elif cat == 'error' %}✕{% else %}i{% endif %}
+      {{ msg }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+
+<footer>
+  <div class="f-logo">ShopEasy</div>
+  <p>AWT College Project &nbsp;·&nbsp; Built with Flask + SQLite &nbsp;·&nbsp; SEM 6 / 3rd Year</p>
+</footer>
+
+<script>
+  // Auto-dismiss flash after 3s
+  setTimeout(() => {
+    document.querySelectorAll('.flash-msg').forEach(el => {
+      el.style.transition = 'opacity .4s';
+      el.style.opacity = '0';
+      setTimeout(() => el.remove(), 400);
+    });
+  }, 3000);
+</script>
+</body>
+</html>

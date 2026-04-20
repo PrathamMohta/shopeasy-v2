@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% block title %}{{ product['name'] }}{% endblock %}
+
+{% block head %}
+<style>
+.back { color: var(--accent); font-size: 0.85rem; font-weight: 700; display:inline-flex; align-items:center; gap:4px; margin-bottom:18px; }
+.back:hover { text-decoration: underline; }
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 28px;
+  align-items: start;
+  margin-bottom: 36px;
+}
+.detail-img-box {
+  background: linear-gradient(135deg, #f0f4ff, #e8f4fd);
+  border-radius: 16px;
+  text-align: center;
+  font-size: 9rem;
+  padding: 50px 0;
+  border: 1px solid var(--border);
+}
+.detail-info { }
+.detail-cat  { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 6px; }
+.detail-name { font-size: 1.7rem; font-weight: 900; margin-bottom: 10px; line-height: 1.3; }
+.detail-stars { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.detail-stars .stars { font-size: 18px; }
+.detail-stars .avg   { font-size: 1.1rem; font-weight: 700; }
+.detail-desc { color: #475569; line-height: 1.8; margin-bottom: 20px; font-size: 0.95rem; }
+
+.price-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+.big-price  { font-size: 2rem; font-weight: 900; color: var(--accent); }
+.savings-note { background: #d1fae5; color: #065f46; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; }
+
+.stock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+.stock-ok  { background: #d1fae5; color: #065f46; }
+.stock-low { background: #fef3c7; color: #92400e; }
+.stock-out { background: #fee2e2; color: #991b1b; }
+
+.detail-actions { display: flex; gap: 10px; align-items: center; margin-bottom: 24px; }
+.detail-actions .btn { padding: 12px 28px; font-size: 0.95rem; }
+
+/* ── FEATURES LIST ── */
+.feature-list { display: flex; flex-direction: column; gap: 8px; }
+.feature-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #334155; }
+.feature-item::before { content: '✓'; color: var(--green); font-weight: 900; }
+
+/* ── SECTION HEADING ── */
+.section-heading {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
+}
+
+/* ── REVIEWS ── */
+.review-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+.review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.reviewer-name { font-weight: 700; font-size: 0.9rem; }
+.review-date   { font-size: 0.75rem; color: var(--muted); }
+.review-text   { color: #475569; font-size: 0.88rem; line-height: 1.6; }
+
+/* ── REVIEW FORM ── */
+.review-form {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 22px;
+  margin-bottom: 24px;
+}
+.review-form h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 14px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  font-size: 0.88rem;
+  font-family: inherit;
+  outline: none;
+  background: #fff;
+  color: var(--text);
+  transition: border-color .2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { border-color: var(--accent); }
+.form-group textarea { resize: vertical; min-height: 80px; }
+
+/* ── RELATED ── */
+.related-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+.rel-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform .2s;
+  text-align: center;
+}
+.rel-card:hover { transform: translateY(-3px); }
+.rel-card .emoji { font-size: 3rem; padding: 18px 0 10px; background: #f0f4ff; }
+.rel-card .info  { padding: 10px 12px; }
+.rel-card .rname { font-size: 0.82rem; font-weight: 700; margin-bottom: 4px; }
+.rel-card .rprice { color: var(--accent); font-weight: 800; font-size: 0.9rem; }
+
+@media (max-width: 720px) {
+  .detail-grid { grid-template-columns: 1fr; }
+  .form-row    { grid-template-columns: 1fr; }
+  .related-grid { grid-template-columns: repeat(2,1fr); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <a href="/" class="back">← Back to Shop</a>
+
+  <!-- DETAIL GRID -->
+  <div class="detail-grid">
+    <div class="detail-img-box">{{ product['emoji'] }}</div>
+
+    <div class="detail-info">
+      <div class="detail-cat">{{ product['category'] }}</div>
+      <div class="detail-name">{{ product['name'] }}</div>
+
+      <!-- Stars -->
+      <div class="detail-stars">
+        <span class="stars">
+          {% for i in range(1,6) %}{% if i <= product['rating']|int %}★{% else %}☆{% endif %}{% endfor %}
+        </span>
+        <span class="avg">{{ product['rating'] }}</span>
+        <span style="color:var(--muted);font-size:0.82rem;">({{ product['rating_count'] }} reviews)</span>
+      </div>
+
+      <!-- Description as feature list -->
+      <div class="feature-list" style="margin-bottom:18px;">
+        {% for feat in product['description'].split('|') %}
+        <div class="feature-item">{{ feat.strip() }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Price -->
+      <div class="price-row">
+        <span class="big-price">₹{{ "%.0f"|format(product['price']) }}</span>
+        {% if product['orig_price'] %}
+        <span class="orig-price">₹{{ "%.0f"|format(product['orig_price']) }}</span>
+        {% set disc = ((product['orig_price'] - product['price']) / product['orig_price'] * 100)|int %}
+        <span class="discount">{{ disc }}% off</span>
+        {% endif %}
+      </div>
+
+      {% if product['orig_price'] %}
+      {% set saved = product['orig_price'] - product['price'] %}
+      <div class="savings-note" style="margin-bottom:14px;">You save ₹{{ "%.0f"|format(saved) }}</div>
+      {% endif %}
+
+      <!-- Stock -->
+      {% if product['stock'] >= 10 %}
+      <span class="stock-badge stock-ok">✓ In Stock ({{ product['stock'] }} units)</span>
+      {% elif product['stock'] > 0 %}
+      <span class="stock-badge stock-low">⚠ Only {{ product['stock'] }} left!</span>
+      {% else %}
+      <span class="stock-badge stock-out">✕ Out of Stock</span>
+      {% endif %}
+
+      <!-- Actions -->
+      <div class="detail-actions">
+        <a href="/add_to_cart/{{ product['id'] }}" class="btn btn-red">🛒 Add to Cart</a>
+        <a href="/wishlist/toggle/{{ product['id'] }}"
+           class="btn {% if in_wishlist %}btn-dark{% else %}btn-ghost{% endif %}">
+          {% if in_wishlist %}❤️ Wishlisted{% else %}🤍 Wishlist{% endif %}
+        </a>
+      </div>
+
+      <!-- Badge -->
+      {% if product['badge'] %}
+      <div>
+        <span class="product-badge {% if product['badge']=='Best Seller' %}badge-bestseller{% else %}badge-toprated{% endif %}"
+              style="font-size:0.8rem;padding:4px 12px;">
+          {{ product['badge'] }}
+        </span>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- REVIEWS SECTION -->
+  <div class="section-heading">Customer Reviews ({{ reviews|length }})</div>
+
+  <!-- Review Form -->
+  <div class="review-form">
+    <h4>Write a Review</h4>
+    <form method="POST" action="/review/{{ product['id'] }}">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Your Name</label>
+          <input type="text" name="reviewer" placeholder="e.g. Arjun Patel"/>
+        </div>
+        <div class="form-group">
+          <label>Rating</label>
+          <select name="rating">
+            <option value="5">★★★★★ (5/5)</option>
+            <option value="4">★★★★☆ (4/5)</option>
+            <option value="3">★★★☆☆ (3/5)</option>
+            <option value="2">★★☆☆☆ (2/5)</option>
+            <option value="1">★☆☆☆☆ (1/5)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Your Review</label>
+        <textarea name="comment" placeholder="Share your experience with this product…"></textarea>
+      </div>
+      <button type="submit" class="btn btn-dark btn-sm">Submit Review</button>
+    </form>
+  </div>
+
+  <!-- Existing Reviews -->
+  {% if reviews %}
+    {% for r in reviews %}
+    <div class="review-card">
+      <div class="review-header">
+        <div>
+          <span class="reviewer-name">{{ r['reviewer'] }}</span>
+          <span class="stars" style="font-size:13px;margin-left:8px;">
+            {% for i in range(1,6) %}{% if i <= r['rating'] %}★{% else %}☆{% endif %}{% endfor %}
+          </span>
+        </div>
+        <span class="review-date">{{ r['created_at'][:10] }}</span>
+      </div>
+      {% if r['comment'] %}
+      <p class="review-text">{{ r['comment'] }}</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  {% else %}
+  <p style="color:var(--muted);font-size:0.9rem;margin-bottom:24px;">No reviews yet. Be the first!</p>
+  {% endif %}
+
+  <!-- RELATED PRODUCTS -->
+  {% if related %}
+  <div class="section-heading" style="margin-top:36px;">Related Products</div>
+  <div class="related-grid">
+    {% for p in related %}
+    <a href="/product/{{ p['id'] }}" class="rel-card">
+      <div class="emoji">{{ p['emoji'] }}</div>
+      <div class="info">
+        <div class="rname">{{ p['name'] }}</div>
+        <div class="rprice">₹{{ "%.0f"|format(p['price']) }}</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

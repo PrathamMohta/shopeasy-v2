@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Wishlist{% endblock %}
+
+{% block head %}
+<style>
+.page-h { font-size:1.5rem; font-weight:900; margin-bottom:24px; }
+.wish-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap: 18px; }
+.wcard {
+  background: var(--card);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: transform .2s;
+}
+.wcard:hover { transform: translateY(-4px); }
+.wcard-img { background: linear-gradient(135deg,#f0f4ff,#e8f4fd); text-align:center; font-size:4rem; padding:26px 0 20px; }
+.wcard-body { padding: 13px 15px 15px; }
+.wcard-cat  { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+.wcard-name { font-weight:700; font-size:0.95rem; margin-bottom:8px; }
+.wcard-price { color:var(--accent); font-size:1.1rem; font-weight:900; margin-bottom:10px; }
+.wcard-actions { display:flex; gap:7px; }
+.wcard-actions a { flex:1; text-align:center; }
+
+.empty-state { text-align:center; padding:80px 20px; }
+.empty-state .icon { font-size:4rem; margin-bottom:14px; }
+.empty-state p { color:var(--muted); margin-bottom:20px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+<div class="page-h">♡ Wishlist ({{ products|length }})</div>
+
+{% if products %}
+<div class="wish-grid">
+  {% for p in products %}
+  <div class="wcard">
+    <div class="wcard-img">{{ p['emoji'] }}</div>
+    <div class="wcard-body">
+      <div class="wcard-cat">{{ p['category'] }}</div>
+      <div class="wcard-name">{{ p['name'] }}</div>
+      <div class="wcard-price">₹{{ "%.0f"|format(p['price']) }}</div>
+      <div class="wcard-actions">
+        <a href="/wishlist/toggle/{{ p['id'] }}" class="btn btn-ghost btn-sm">✕ Remove</a>
+        <a href="/add_to_cart/{{ p['id'] }}" class="btn btn-red btn-sm">🛒 Add</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="empty-state">
+  <div class="icon">🤍</div>
+  <p>Your wishlist is empty. Start adding products!</p>
+  <a href="/" class="btn btn-red">Browse Products</a>
+</div>
+{% endif %}
+
+</div>
+{% endblock %}

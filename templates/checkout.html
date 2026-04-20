@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+
+{% block head %}
+<style>
+.checkout-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+.page-h { font-size:1.5rem; font-weight:900; margin-bottom:24px; }
+.back   { color:var(--accent); font-size:0.85rem; font-weight:700; display:inline-flex; align-items:center; gap:4px; margin-bottom:18px; }
+
+/* Form Card */
+.form-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px 30px;
+}
+.form-card h3 { font-size:1rem; font-weight:800; margin-bottom:18px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+.form-group   { margin-bottom:16px; }
+.form-group label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 9px;
+  border: 1.5px solid var(--border);
+  font-size: 0.92rem;
+  font-family: inherit;
+  outline: none;
+  color: var(--text);
+  background: #fff;
+  transition: border-color .2s;
+}
+.form-group input:focus,
+.form-group textarea:focus { border-color: var(--accent); }
+.form-group textarea { resize: vertical; min-height: 90px; }
+
+/* Order Panel */
+.order-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.order-panel .op-head {
+  background: var(--navy);
+  color: #fff;
+  padding: 14px 18px;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+.order-panel .op-body { padding: 16px 18px; }
+.op-item { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; }
+.op-item .lbl { color: var(--muted); }
+.op-divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+.op-total { display: flex; justify-content: space-between; font-weight: 900; font-size: 1.1rem; margin-bottom: 4px; }
+.op-total span:last-child { color: var(--accent); }
+
+/* Secure note */
+.secure-note { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--muted); margin-top: 12px; }
+
+@media (max-width:700px) { .checkout-layout { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <a href="/cart" class="back">← Back to Cart</a>
+  <div class="page-h">📦 Checkout</div>
+
+  <div class="checkout-layout">
+
+    <!-- LEFT: Form -->
+    <div class="form-card">
+      <h3>📋 Delivery Details</h3>
+      <form method="POST" action="/checkout">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" name="name" placeholder="e.g. Priya Sharma" required/>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" name="email" placeholder="e.g. priya@gmail.com" required/>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" name="phone" placeholder="e.g. 9876543210"/>
+        </div>
+        <div class="form-group">
+          <label>Delivery Address</label>
+          <textarea name="address" placeholder="Flat/House No., Street, City, PIN Code…" required></textarea>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;"/>
+        <h3 style="margin-bottom:14px;">💳 Payment Method</h3>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+          {% for method, icon in [('Cash on Delivery','💵'),('UPI / QR','📱'),('Net Banking','🏦'),('Credit / Debit Card','💳')] %}
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:11px 14px;border-radius:9px;border:1.5px solid var(--border);font-size:0.9rem;font-weight:600;transition:border-color .15s;" onmouseover="this.style.borderColor='#f43f5e'" onmouseout="this.style.borderColor='var(--border)'">
+            <input type="radio" name="payment" value="{{ method }}" {% if loop.first %}checked{% endif %} style="accent-color:var(--accent);width:16px;height:16px;"/>
+            {{ icon }} {{ method }}
+          </label>
+          {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-red" style="width:100%;justify-content:center;padding:14px;font-size:0.97rem;">
+          ✅ Place Order
+        </button>
+        <div class="secure-note">🔒 Your information is safe and secure</div>
+      </form>
+    </div>
+
+    <!-- RIGHT: Order Summary -->
+    <div class="order-panel">
+      <div class="op-head">🧾 Order Summary</div>
+      <div class="op-body">
+        {% for item in items %}
+        <div class="op-item">
+          <span class="lbl">{{ item['name'] }} × {{ item['qty'] }}</span>
+          <span>₹{{ "%.0f"|format(item['subtotal']) }}</span>
+        </div>
+        {% endfor %}
+        <hr class="op-divider"/>
+        <div class="op-item"><span class="lbl">Delivery</span><span style="color:var(--green);font-weight:700;">FREE</span></div>
+        <hr class="op-divider"/>
+        <div class="op-total"><span>Total</span><span>₹{{ "%.0f"|format(total) }}</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
